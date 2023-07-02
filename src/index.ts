@@ -1,17 +1,13 @@
-import { Application, Loader, Texture, Sprite } from "pixi.js";
+import { Application, Loader, Texture, Sprite, LoaderResource } from "pixi.js";
 import "./style.css";
-import { Cell } from "./cell";
 import { GameMenu } from "./game-menu";
-
-declare const VERSION: string;
+import { ChessBoard } from "./board";
 
 const gameWidth = 800;
 const gameHeight = 800;
 
-console.log(`Welcome from pixi-typescript-boilerplate ${VERSION}`);
-
 const app = new Application({
-    backgroundColor: 0xd3d3d3,
+    backgroundColor: 0x292a2f,
     width: gameWidth,
     height: gameHeight,
 });
@@ -22,24 +18,47 @@ window.onload = async (): Promise<void> => {
 
     // resizeCanvas();
 
-    const bt = new Cell(Loader.shared.resources["black_tile"].texture as Texture);
-    const playButtonSprite = new Sprite(Loader.shared.resources["play"].texture as Texture);
-    const gameMenuScreen = new GameMenu(playButtonSprite, app, bt);
+    const chessBoard = new ChessBoard();
+    chessBoard.position.set(app.view.width / 2 - chessBoard.width / 2, app.view.height / 2 - chessBoard.height / 2);
+    chessBoard.visible = true;
+    chessBoard.populateBoard();
 
-    bt.visible = false;
+    const playButtonSprite = new Sprite(Loader.shared.resources["play"].texture as Texture);
+    const gameMenuScreen = new GameMenu(playButtonSprite, app, chessBoard);
+    gameMenuScreen.visible = false;
 
     app.stage.addChild(gameMenuScreen);
-    app.stage.addChild(bt);
+    app.stage.addChild(chessBoard);
 };
 
-async function loadGameAssets(): Promise<void> {
-    return new Promise((res, rej) => {
+// todo check if this changes is necessary or is the loader shared like state??
+async function loadGameAssets(): Promise<Record<string, LoaderResource>> {
+    return new Promise<Record<string, LoaderResource>>((res, rej) => {
         const loader = Loader.shared;
-        loader.add("black_tile", "./assets/chess-board/black_tile.png");
-        loader.add("play", "./assets/chess-board/play_button.png");
+        const assetUrls = [
+            { name: "play", url: "./assets/chess-board/play_button.png" },
+            { name: "b_bishop", url: "/assets/chess-board/B_Bishop.png" },
+            { name: "b_king", url: "/assets/chess-board/B_King.png" },
+            { name: "b_knight", url: "/assets/chess-board/B_Knight.png" },
+            { name: "b_pawn", url: "/assets/chess-board/B_Pawn.png" },
+            { name: "b_queen", url: "/assets/chess-board/B_Queen.png" },
+            { name: "b_rook", url: "/assets/chess-board/B_Rook.png" },
+            { name: "w_bishop", url: "/assets/chess-board/W_Bishop.png" },
+            { name: "w_king", url: "/assets/chess-board/W_King.png" },
+            { name: "w_knight", url: "/assets/chess-board/W_Knight.png" },
+            { name: "w_pawn", url: "/assets/chess-board/W_Pawn.png" },
+            { name: "w_queen", url: "/assets/chess-board/W_Queen.png" },
+            { name: "w_rook", url: "/assets/chess-board/W_Rook.png" },
+        ];
+        const loadedAssets: Record<string, LoaderResource> = {};
+
+        assetUrls.forEach((asset) => {
+            loader.add(asset.name, asset.url);
+        });
 
         loader.onComplete.once(() => {
-            res();
+            Object.assign(loadedAssets, loader.resources);
+            res(loadedAssets);
         });
 
         loader.onError.once(() => {

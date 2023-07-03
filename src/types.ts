@@ -2,13 +2,12 @@ import { Graphics } from "pixi.js";
 import { Piece } from "./piece";
 
 export interface Cell {
-    isAvailable: boolean;
-    isAttacked: boolean;
     isSelected: boolean;
-    isHighlighted: boolean;
-    color: any; //todo
+    color: number;
     piece: any;
     graphics: Graphics;
+    row: number;
+    col: number;
 }
 
 export interface Pieces {
@@ -35,10 +34,4 @@ export interface PieceList {
     pawn6: Piece;
     pawn7: Piece;
     pawn8: Piece;
-}
-
-export interface AlivePieces {
-    white: Piece[];
-    black: Piece[];
-    [key: string]: Piece[];
 }

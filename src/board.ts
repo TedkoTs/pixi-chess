@@ -1,12 +1,15 @@
 import * as PIXI from "pixi.js";
 import { Piece, PieceType } from "./piece";
-import { AlivePieces, Cell, Pieces } from "./types";
-import { Texture } from "pixi.js";
+import { Cell, Pieces } from "./types";
+import { InteractionEvent, Texture } from "pixi.js";
 
 export class ChessBoard extends PIXI.Container {
     protected squares: Cell[][] = [];
     private pieces: Pieces | undefined;
-    private alivePieces: AlivePieces | undefined;
+    private isWhiteTurn = true;
+
+    private selectedCell: Cell | undefined;
+    private targetCell: Cell | undefined;
 
     constructor() {
         super();
@@ -16,13 +19,12 @@ export class ChessBoard extends PIXI.Container {
             this.squares.push([]);
             for (let col = 0; col < 8; col++) {
                 this.squares[row].push({
-                    color: isDark ? 0xc88340 : 0xffffff,
-                    isAvailable: false,
-                    isAttacked: false,
+                    color: isDark ? 0x596070 : 0xeaf0d8,
                     isSelected: false,
-                    isHighlighted: false,
                     piece: null,
                     graphics: new PIXI.Graphics(),
+                    row: row,
+                    col: col,
                 });
 
                 const x = col * 80;
@@ -35,13 +37,16 @@ export class ChessBoard extends PIXI.Container {
                 cell.graphics.x = x;
                 cell.graphics.y = y;
 
+                cell.graphics.interactive = true;
+                cell.graphics.buttonMode = true;
+
+                cell.graphics.on("pointerdown", this.onPieceClick, this);
+
                 this.addChild(cell.graphics);
                 isDark = !isDark;
             }
             isDark = !isDark;
         }
-
-        console.log(this.squares);
     }
 
     placePiece(row: number, col: number, piece: Piece) {
@@ -63,52 +68,51 @@ export class ChessBoard extends PIXI.Container {
         const assets = PIXI.Loader.shared.resources;
         this.pieces = {
             black: {
-                lRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook),
-                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight),
-                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop),
-                queen: new Piece(assets["b_queen"].texture as Texture, PieceType.Queen),
-                king: new Piece(assets["b_king"].texture as Texture, PieceType.King),
-                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop),
-                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight),
-                rRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook),
-                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
-                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn),
+                lRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook, "black"),
+                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight, "black"),
+                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop, "black"),
+                queen: new Piece(assets["b_queen"].texture as Texture, PieceType.Queen, "black"),
+                king: new Piece(assets["b_king"].texture as Texture, PieceType.King, "black"),
+                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop, "black"),
+                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight, "black"),
+                rRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook, "black"),
+                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
             },
             white: {
-                lRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook),
-                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight),
-                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop),
-                queen: new Piece(assets["w_queen"].texture as Texture, PieceType.Queen),
-                king: new Piece(assets["w_king"].texture as Texture, PieceType.King),
-                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop),
-                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight),
-                rRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook),
-                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
-                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn),
+                lRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook, "white"),
+                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight, "white"),
+                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop, "white"),
+                queen: new Piece(assets["w_queen"].texture as Texture, PieceType.Queen, "white"),
+                king: new Piece(assets["w_king"].texture as Texture, PieceType.King, "white"),
+                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop, "white"),
+                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight, "white"),
+                rRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook, "white"),
+                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
             },
-        };
-        this.alivePieces = {
-            white: [],
-            black: [],
         };
 
         for (const color in this.pieces) {
             for (const key in this.pieces[color]) {
                 const piece = this.pieces[color][key];
+                if (color === "black") {
+                    piece.scale.set(-2);
+                }
+                piece.on("pointerdown", this.onPieceClick, this);
                 piece.chessBoard = this;
-                this.alivePieces[color].push(piece);
             }
         }
 
@@ -164,5 +168,150 @@ export class ChessBoard extends PIXI.Container {
 
             this.addChild(blackPawn, whitePawn);
         }
+
+        if (this.isWhiteTurn) {
+            this.disableBlackPieces();
+        }
+    }
+
+    disableBlackPieces() {
+        if (this.pieces) {
+            for (const key in this.pieces.black) {
+                const piece = this.pieces.black[key];
+                piece.interactive = false;
+                piece.buttonMode = false;
+            }
+            for (const key in this.pieces.white) {
+                const piece = this.pieces.white[key];
+                piece.interactive = true;
+                piece.buttonMode = true;
+            }
+        }
+    }
+
+    enableBlackPieces() {
+        if (this.pieces) {
+            for (const key in this.pieces.black) {
+                const piece = this.pieces.black[key];
+                piece.interactive = true;
+                piece.buttonMode = true;
+            }
+            for (const key in this.pieces.white) {
+                const piece = this.pieces.white[key];
+                piece.interactive = false;
+                piece.buttonMode = false;
+            }
+        }
+    }
+
+    switchTurn() {
+        if (this.isWhiteTurn) {
+            this.enableBlackPieces();
+            this.isWhiteTurn = false;
+        } else {
+            this.disableBlackPieces();
+            this.isWhiteTurn = true;
+        }
+        setTimeout(() => {
+            this.rotateBoard();
+        }, 500);
+    }
+
+    rotateBoard() {
+        const targetRotation = this.rotation + Math.PI;
+        const rotationSpeed = 0.08;
+
+        const updateRotation = (delta: number) => {
+            const diff = targetRotation - this.rotation;
+            if (Math.abs(diff) <= rotationSpeed * delta) {
+                this.position.set(320, 320);
+                this.pivot.set(320, 320);
+                this.rotation = targetRotation;
+                PIXI.Ticker.shared.remove(updateRotation);
+            } else {
+                this.position.set(320, 320);
+                this.pivot.set(320, 320);
+                this.rotation += Math.sign(diff) * rotationSpeed * delta;
+            }
+        };
+
+        PIXI.Ticker.shared.add(updateRotation);
+    }
+
+    onPieceClick(event: InteractionEvent) {
+        const cell = this.getCellOnClick(event);
+
+        if (!this.selectedCell) {
+            if (cell.piece && cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+                this.selectedCell = cell;
+                this.selectedCell.isSelected = true;
+                this.highlight(this.selectedCell);
+            }
+        } else if (this.selectedCell === cell) {
+            this.removeHighlight(this.selectedCell);
+            this.selectedCell.isSelected = false;
+            this.selectedCell = undefined;
+        } else if (!cell.piece) {
+            if (this.selectedCell.piece && this.selectedCell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+                this.targetCell = cell;
+                this.removeHighlight(this.selectedCell);
+                this.moveSelectedToTarget();
+            }
+        } else if (this.selectedCell.piece !== cell.piece) {
+            if (cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+                this.targetCell = cell;
+                this.removeHighlight(this.selectedCell);
+                this.selectedCell.isSelected = false;
+                this.selectedCell = undefined;
+                this.highlight(this.targetCell);
+            }
+        }
+    }
+
+    getCellOnClick(event: InteractionEvent): Cell {
+        const position = event.data.getLocalPosition(this);
+        const col = Math.floor(position.x / 80);
+        const row = Math.floor(position.y / 80);
+        return this.squares[row][col];
+    }
+
+    highlight(cell: Cell) {
+        const piece = cell.piece;
+        if (piece && piece.color === "white") {
+            piece.anchor.set(0.5, 0.7);
+            piece.scale.set(2.5);
+        }
+        if (piece && piece.color === "black") {
+            piece.anchor.set(0.5, 0.7);
+            piece.scale.set(-2.5);
+        }
+    }
+
+    removeHighlight(cell: Cell) {
+        const piece = cell.piece;
+        if (piece && piece.color === "white") {
+            piece.anchor.set(0.5, 0.5);
+            piece.scale.set(2);
+        }
+        if (piece && piece.color === "black") {
+            piece.anchor.set(0.5, 0.5);
+            piece.scale.set(-2);
+        }
+    }
+
+    moveSelectedToTarget() {
+        if (this.selectedCell && this.targetCell) {
+            const pieceToMove = this.selectedCell.piece;
+            if (pieceToMove) {
+                const { row: targetRow, col: targetCol } = this.targetCell;
+                this.placePiece(targetRow, targetCol, pieceToMove);
+                this.selectedCell.piece = null;
+            }
+
+            this.selectedCell.isSelected = false;
+            this.selectedCell = undefined;
+            this.targetCell = undefined;
+        }
+        this.switchTurn();
     }
 }

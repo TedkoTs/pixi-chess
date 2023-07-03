@@ -3,8 +3,8 @@ import "./style.css";
 import { GameMenu } from "./game-menu";
 import { ChessBoard } from "./board";
 
-const gameWidth = 800;
-const gameHeight = 800;
+const gameWidth = 640;
+const gameHeight = 640;
 
 const app = new Application({
     backgroundColor: 0x292a2f,
@@ -19,7 +19,6 @@ window.onload = async (): Promise<void> => {
     // resizeCanvas();
 
     const chessBoard = new ChessBoard();
-    chessBoard.position.set(app.view.width / 2 - chessBoard.width / 2, app.view.height / 2 - chessBoard.height / 2);
     chessBoard.visible = true;
     chessBoard.populateBoard();
 

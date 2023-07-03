@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { Texture } from "pixi.js";
+import { InteractionEvent, Texture } from "pixi.js";
 import { ChessBoard } from "./board";
 
 export enum PieceType {
@@ -12,24 +12,23 @@ export enum PieceType {
 }
 
 export class Piece extends PIXI.Sprite {
-    public type: PieceType;
+    public pieceType: PieceType;
     public chessBoard: ChessBoard | null = null;
     public row = 0;
     public col = 0;
+    public color: string;
 
-    constructor(texture: Texture, type: PieceType) {
+    constructor(texture: Texture, type: PieceType, color: string) {
         super(texture);
 
         this.anchor.set(0.5, 0.5);
         this.scale.set(2);
+        this.color = color;
 
-        this.type = type;
-    }
+        this.pieceType = type;
 
-    setPosition(row: number, col: number) {
-        const cellSize = 80; // Size of each square
-        this.position.set(col * cellSize + cellSize / 2, row * cellSize + cellSize / 2);
-        this.row = row;
-        this.col = col;
+        this.on("pointerdown", (event: InteractionEvent) => {
+            this.emit("piecedown", event);
+        });
     }
 }

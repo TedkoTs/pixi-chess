@@ -35,3 +35,12 @@ export interface PieceList {
     pawn7: Piece;
     pawn8: Piece;
 }
+
+export enum PieceTypeEnum {
+    Pawn = "P",
+    Rook = "R",
+    Bishop = "B",
+    Knight = "Kn",
+    Queen = "Q",
+    King = "K",
+}

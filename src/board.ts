@@ -1,18 +1,19 @@
-import * as PIXI from "pixi.js";
-import { Piece, PieceType } from "./piece";
-import { Cell, Pieces } from "./types";
-import { InteractionEvent, Texture } from "pixi.js";
+import { Piece } from "./piece";
+import { Cell, Pieces, PieceTypeEnum } from "./models";
+import { Application, Container, Graphics, InteractionEvent, Loader, Texture, Ticker } from "pixi.js";
 
-export class ChessBoard extends PIXI.Container {
+export class ChessBoard extends Container {
     protected squares: Cell[][] = [];
     private pieces: Pieces | undefined;
     private isWhiteTurn = true;
 
     private selectedCell: Cell | undefined;
     private targetCell: Cell | undefined;
+    private app;
 
-    constructor() {
+    constructor(app: Application) {
         super();
+        this.app = app;
 
         let isDark = false;
         for (let row = 0; row < 8; row++) {
@@ -22,17 +23,20 @@ export class ChessBoard extends PIXI.Container {
                     color: isDark ? 0x596070 : 0xeaf0d8,
                     isSelected: false,
                     piece: null,
-                    graphics: new PIXI.Graphics(),
+                    graphics: new Graphics(),
                     row: row,
                     col: col,
                 });
 
-                const x = col * 80;
-                const y = row * 80;
+                const x = (col * app.view.width) / 8;
+                const y = (row * app.view.height) / 8;
 
                 const cell = this.squares[row][col];
 
-                cell.graphics.beginFill(cell.color).drawRect(0, 0, 80, 80).endFill();
+                cell.graphics
+                    .beginFill(cell.color)
+                    .drawRect(0, 0, app.view.width / 8, app.view.height / 8)
+                    .endFill();
 
                 cell.graphics.x = x;
                 cell.graphics.y = y;
@@ -51,7 +55,7 @@ export class ChessBoard extends PIXI.Container {
 
     placePiece(row: number, col: number, piece: Piece) {
         const cell = this.squares[row][col];
-        const cellSize = 80;
+        const cellSize = this.app.view.width / 8;
 
         if (piece) {
             const x = col * cellSize + cellSize / 2;
@@ -65,43 +69,43 @@ export class ChessBoard extends PIXI.Container {
     }
 
     populateBoard() {
-        const assets = PIXI.Loader.shared.resources;
+        const assets = Loader.shared.resources;
         this.pieces = {
             black: {
-                lRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook, "black"),
-                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight, "black"),
-                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop, "black"),
-                queen: new Piece(assets["b_queen"].texture as Texture, PieceType.Queen, "black"),
-                king: new Piece(assets["b_king"].texture as Texture, PieceType.King, "black"),
-                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceType.Bishop, "black"),
-                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceType.Knight, "black"),
-                rRook: new Piece(assets["b_rook"].texture as Texture, PieceType.Rook, "black"),
-                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
-                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceType.Pawn, "black"),
+                lRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, "black"),
+                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, "black"),
+                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, "black"),
+                queen: new Piece(assets["b_queen"].texture as Texture, PieceTypeEnum.Queen, "black"),
+                king: new Piece(assets["b_king"].texture as Texture, PieceTypeEnum.King, "black"),
+                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, "black"),
+                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, "black"),
+                rRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, "black"),
+                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
             },
             white: {
-                lRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook, "white"),
-                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight, "white"),
-                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop, "white"),
-                queen: new Piece(assets["w_queen"].texture as Texture, PieceType.Queen, "white"),
-                king: new Piece(assets["w_king"].texture as Texture, PieceType.King, "white"),
-                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceType.Bishop, "white"),
-                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceType.Knight, "white"),
-                rRook: new Piece(assets["w_rook"].texture as Texture, PieceType.Rook, "white"),
-                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
-                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceType.Pawn, "white"),
+                lRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, "white"),
+                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, "white"),
+                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, "white"),
+                queen: new Piece(assets["w_queen"].texture as Texture, PieceTypeEnum.Queen, "white"),
+                king: new Piece(assets["w_king"].texture as Texture, PieceTypeEnum.King, "white"),
+                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, "white"),
+                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, "white"),
+                rRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, "white"),
+                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
             },
         };
 
@@ -112,7 +116,6 @@ export class ChessBoard extends PIXI.Container {
                     piece.scale.set(-2);
                 }
                 piece.on("pointerdown", this.onPieceClick, this);
-                piece.chessBoard = this;
             }
         }
 
@@ -163,55 +166,15 @@ export class ChessBoard extends PIXI.Container {
             const blackPawn = this.pieces.black["pawn" + i];
             const whitePawn = this.pieces.white["pawn" + i];
 
-            this.placePiece(blacksRow + 1, i - 1, blackPawn); // Place black pawns in the second row
-            this.placePiece(whitesRow - 1, i - 1, whitePawn); // Place white pawns in the second-to-last row
+            this.placePiece(blacksRow + 1, i - 1, blackPawn);
+            this.placePiece(whitesRow - 1, i - 1, whitePawn);
 
             this.addChild(blackPawn, whitePawn);
-        }
-
-        if (this.isWhiteTurn) {
-            // this.disableBlackPieces();
-        }
-    }
-
-    disableBlackPieces() {
-        if (this.pieces) {
-            for (const key in this.pieces.black) {
-                const piece = this.pieces.black[key];
-                piece.interactive = false;
-                piece.buttonMode = false;
-            }
-            for (const key in this.pieces.white) {
-                const piece = this.pieces.white[key];
-                piece.interactive = true;
-                piece.buttonMode = true;
-            }
-        }
-    }
-
-    enableBlackPieces() {
-        if (this.pieces) {
-            for (const key in this.pieces.black) {
-                const piece = this.pieces.black[key];
-                piece.interactive = true;
-                piece.buttonMode = true;
-            }
-            for (const key in this.pieces.white) {
-                const piece = this.pieces.white[key];
-                piece.interactive = false;
-                piece.buttonMode = false;
-            }
         }
     }
 
     switchTurn() {
-        if (this.isWhiteTurn) {
-            // this.enableBlackPieces();
-            this.isWhiteTurn = false;
-        } else {
-            // this.disableBlackPieces();
-            this.isWhiteTurn = true;
-        }
+        this.isWhiteTurn = !this.isWhiteTurn;
         setTimeout(() => {
             this.rotateBoard();
         }, 500);
@@ -224,21 +187,19 @@ export class ChessBoard extends PIXI.Container {
         const updateRotation = (delta: number) => {
             const diff = targetRotation - this.rotation;
             if (Math.abs(diff) <= rotationSpeed * delta) {
-                this.position.set(320, 320);
-                this.pivot.set(320, 320);
+                this.position.set(this.app.view.width / 2, this.app.view.height / 2);
+                this.pivot.set(this.app.view.width / 2, this.app.view.height / 2);
                 this.rotation = targetRotation;
-                PIXI.Ticker.shared.remove(updateRotation);
+                Ticker.shared.remove(updateRotation);
             } else {
-                this.position.set(320, 320);
-                this.pivot.set(320, 320);
+                this.position.set(this.app.view.width / 2, this.app.view.height / 2);
+                this.pivot.set(this.app.view.width / 2, this.app.view.height / 2);
                 this.rotation += Math.sign(diff) * rotationSpeed * delta;
             }
         };
 
-        PIXI.Ticker.shared.add(updateRotation);
+        Ticker.shared.add(updateRotation);
     }
-
-    // todo possibly takes the color of the cells not the pieces -> white pieces go on white cells but remove on black cells
 
     onPieceClick(event: InteractionEvent) {
         const cell = this.getCellOnClick(event);
@@ -257,7 +218,12 @@ export class ChessBoard extends PIXI.Container {
             if (this.selectedCell.piece && this.selectedCell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
-                this.moveSelectedToTarget();
+                if (this.isValidMove(this.selectedCell.piece, this.targetCell)) {
+                    this.moveSelectedToTarget();
+                } else {
+                    this.targetCell = undefined;
+                    this.addHighlight(this.selectedCell);
+                }
             }
         } else if (this.selectedCell.piece !== cell.piece) {
             if (cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
@@ -271,17 +237,20 @@ export class ChessBoard extends PIXI.Container {
             if (cell.piece.color !== (this.isWhiteTurn ? "white" : "black")) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
-                this.removePieceFromBoard(this.targetCell);
-
-                this.moveSelectedToTarget();
+                if (this.isValidMove(this.selectedCell.piece, this.targetCell)) {
+                    this.removePieceFromBoard(this.targetCell);
+                    this.moveSelectedToTarget();
+                } else {
+                    this.addHighlight(this.selectedCell);
+                }
             }
         }
     }
 
     getCellOnClick(event: InteractionEvent): Cell {
         const position = event.data.getLocalPosition(this);
-        const col = Math.floor(position.x / 80);
-        const row = Math.floor(position.y / 80);
+        const col = Math.floor(position.x / (this.app.view.width / 8));
+        const row = Math.floor(position.y / (this.app.view.height / 8));
         return this.squares[row][col];
     }
 
@@ -290,10 +259,12 @@ export class ChessBoard extends PIXI.Container {
         if (piece && piece.color === "white") {
             piece.anchor.set(0.5, 0.7);
             piece.scale.set(2.5);
+            piece.tint = 0x1bff66;
         }
         if (piece && piece.color === "black") {
             piece.anchor.set(0.5, 0.7);
             piece.scale.set(-2.5);
+            piece.tint = 0x1bff66;
         }
     }
 
@@ -302,10 +273,12 @@ export class ChessBoard extends PIXI.Container {
         if (piece && piece.color === "white") {
             piece.anchor.set(0.5, 0.5);
             piece.scale.set(2);
+            piece.tint = 0xffffff;
         }
         if (piece && piece.color === "black") {
             piece.anchor.set(0.5, 0.5);
             piece.scale.set(-2);
+            piece.tint = 0xffffff;
         }
     }
 
@@ -332,24 +305,23 @@ export class ChessBoard extends PIXI.Container {
             return false;
         }
         switch (piece.pieceType) {
-            case PieceType.Pawn:
+            case PieceTypeEnum.Pawn:
                 return this.isValidPawnMove(piece, targetCell);
-            case PieceType.Rook:
+            case PieceTypeEnum.Rook:
                 return this.isValidRookMove(piece, targetCell);
-            case PieceType.Knight:
+            case PieceTypeEnum.Knight:
                 return this.isValidKnightMove(piece, targetCell);
-            case PieceType.Bishop:
+            case PieceTypeEnum.Bishop:
                 return this.isValidBishopMove(piece, targetCell);
-            case PieceType.Queen:
+            case PieceTypeEnum.Queen:
                 return this.isValidRookMove(piece, targetCell) || this.isValidBishopMove(piece, targetCell);
-            case PieceType.King:
+            case PieceTypeEnum.King:
                 return this.isValidKingMove(piece, targetCell);
             default:
                 return false;
         }
     }
 
-    //todo don't change player on illegal move
     checkFirstPawnMove(row: number | undefined) {
         return row === 1 || row === 6;
     }
@@ -500,11 +472,7 @@ export class ChessBoard extends PIXI.Container {
         const rowDistance = Math.abs(targetRow - startRow);
         const colDistance = Math.abs(targetCol - startCol);
 
-        if (rowDistance > 1 || colDistance > 1) {
-            return false;
-        }
-
-        return true;
+        return !(rowDistance > 1 || colDistance > 1);
     }
 
     removePieceFromBoard(cell: Cell): void {

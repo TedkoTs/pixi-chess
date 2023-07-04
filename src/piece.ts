@@ -1,24 +1,13 @@
-import * as PIXI from "pixi.js";
-import { InteractionEvent, Texture } from "pixi.js";
-import { ChessBoard } from "./board";
+import { InteractionEvent, Texture, Sprite } from "pixi.js";
+import { PieceTypeEnum } from "./models";
 
-export enum PieceType {
-    Pawn = "P",
-    Rook = "R",
-    Bishop = "B",
-    Knight = "Kn",
-    Queen = "Q",
-    King = "K",
-}
-
-export class Piece extends PIXI.Sprite {
-    public pieceType: PieceType;
-    public chessBoard: ChessBoard | null = null;
+export class Piece extends Sprite {
+    public pieceType: PieceTypeEnum;
     public row = 0;
     public col = 0;
     public color: string;
 
-    constructor(texture: Texture, type: PieceType, color: string) {
+    constructor(texture: Texture, type: PieceTypeEnum, color: string) {
         super(texture);
 
         this.anchor.set(0.5, 0.5);

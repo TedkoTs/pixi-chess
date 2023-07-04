@@ -1,4 +1,4 @@
-import { Application, Loader, Texture, Sprite, LoaderResource } from "pixi.js";
+import { Application, Loader, Texture, Sprite } from "pixi.js";
 import "./style.css";
 import { GameMenu } from "./game-menu";
 import { ChessBoard } from "./board";
@@ -16,25 +16,31 @@ window.onload = async (): Promise<void> => {
     await loadGameAssets();
     document.body.appendChild(app.view);
 
-    // resizeCanvas();
-
-    const chessBoard = new ChessBoard();
-    chessBoard.visible = true;
+    const chessBoard = new ChessBoard(app);
+    chessBoard.visible = false;
     chessBoard.populateBoard();
 
     const playButtonSprite = new Sprite(Loader.shared.resources["play"].texture as Texture);
+    playButtonSprite.on("mouseover", () => {
+        playButtonSprite.tint = 0x1bff66;
+    });
+
+    playButtonSprite.on("mouseout", () => {
+        playButtonSprite.tint = 0xffffff;
+    });
+
     const gameMenuScreen = new GameMenu(playButtonSprite, app, chessBoard);
-    gameMenuScreen.visible = false;
+    gameMenuScreen.visible = true;
 
     app.stage.addChild(gameMenuScreen);
     app.stage.addChild(chessBoard);
 };
 
-// todo check if this changes is necessary or is the loader shared like state??
-async function loadGameAssets(): Promise<Record<string, LoaderResource>> {
-    return new Promise<Record<string, LoaderResource>>((res, rej) => {
+async function loadGameAssets(): Promise<void> {
+    return new Promise((res, rej) => {
         const loader = Loader.shared;
         const assetUrls = [
+            { name: "bg", url: "./assets/chess-board/ss_bg.png" },
             { name: "play", url: "./assets/chess-board/play_button.png" },
             { name: "b_bishop", url: "/assets/chess-board/B_Bishop.png" },
             { name: "b_king", url: "/assets/chess-board/B_King.png" },
@@ -49,15 +55,12 @@ async function loadGameAssets(): Promise<Record<string, LoaderResource>> {
             { name: "w_queen", url: "/assets/chess-board/W_Queen.png" },
             { name: "w_rook", url: "/assets/chess-board/W_Rook.png" },
         ];
-        const loadedAssets: Record<string, LoaderResource> = {};
-
         assetUrls.forEach((asset) => {
             loader.add(asset.name, asset.url);
         });
 
         loader.onComplete.once(() => {
-            Object.assign(loadedAssets, loader.resources);
-            res(loadedAssets);
+            res();
         });
 
         loader.onError.once(() => {
@@ -67,15 +70,3 @@ async function loadGameAssets(): Promise<Record<string, LoaderResource>> {
         loader.load();
     });
 }
-
-// function resizeCanvas(): void {
-//     const resize = () => {
-//         app.renderer.resize(window.innerWidth, window.innerHeight);
-//         app.stage.scale.x = window.innerWidth / gameWidth;
-//         app.stage.scale.y = window.innerHeight / gameHeight;
-//     };
-//
-//     resize();
-//
-//     window.addEventListener("resize", resize);
-// }

@@ -1,40 +1,24 @@
-this needs adjustment
-[pixel chess - Free asset pack by dani maccari.url](..%2F..%2F..%2F..%2FT4F7E%7E1.TSV%2FAppData%2FLocal%2FTemp%2Fpixel%20chess%20-%20Free%20asset%20pack%20by%20dani%20maccari.url)
+# Chess Web Application
 
-# pixi-typescript-boilerplate
+## Chess web app made with pixi.js and typescript
 
-
-## Beginner friendly template for pixi.js with [Webpack](https://webpack.js.org/)
-
-![pixi.js logo](https://pixijs.download/pixijs-banner-no-version.png?v=1)
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/14e7ef42-5c90-44c8-a7ec-0b6e20c59735/deploy-status)](https://pixi-typescript-boilerplate.netlify.com) ![Windows build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/Windows%20build/badge.svg?branch=master) ![Linux build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/Linux%20build/badge.svg) ![MacOs build](https://github.com/jkanchelov/pixi-typescript-boilerplate/workflows/MacOs%20build/badge.svg)
-
-
+### Compiled with webpack based on [this](https://github.com/yordan-kanchelov/pixi-typescript-boilerplate) template
 
 ## Highlights
 
--   🔰 - Beginner friendly.
--   🚀 - Blazing fast bundle times ( by using [swc](https://github.com/swc-project/swc) for transpiling ) 
--   🛠 - Typescript + swc
--   ✈️ - Live reload.
--   📝 - Consistent code style using Prettier and Eslint
--   📝 - Unit test support with [Jest](https://jestjs.io/), generating code coverage.
+-   Chess game made with typescript and pixi.js for rendering the graphics
+-   The board rotates showing who is the current player - white or black (i.e. player one or player two)
+-   Pieces move on the board according to the chess rules, attacking and taking enemy pieces is available
+-   Check and checkmate is not implemented at this time
 
 ## Usage
 
-### Click on the green button "Use this template" on top of the repo or <br> <br> Simply copy paste this and start coding
+Make sure you have an up-to-date versions of node and npm.
 
-`git clone --depth=1 --branch=master https://github.com/yordan-kanchelov/pixi-typescript-boilerplate`
+-   `npm install` - install the dependencies
+-   `npm run start` - runs the game on [local](http://localhost:8080) and watches for changes in the files
 
-`rm -rf ./pixi-typescript-boilerplate/.git`
+#### Assets
 
-## Commands:
-
--   `npm run build` - starts build procedure
--   `npm run start` - start watching for files and open's server on localhost:8080
--   `npm run test` - run tests
--   `npm run code-coverage` - generate code coverage report
--   `npm run code-style-check` - run's eslint and prettier check on your code
-
-For vscode users - ctrl ( or ⌘ ) + shift + b will run the watch build as its set as default vscode task
+-   Start screen and play button made by [Silvia Ivanova](https://www.behance.net/SilviyaIvanova?tracking_source=search_users|silviya%20ivanova)
+-   Chess pieces [Dani Maccari](https://dani-maccari.itch.io/)

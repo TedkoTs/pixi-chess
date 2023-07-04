@@ -2,6 +2,7 @@ import { Application, Loader, Texture, Sprite } from "pixi.js";
 import "./style.css";
 import { GameMenu } from "./game-menu";
 import { ChessBoard } from "./board";
+import { Colors } from "./models";
 
 const gameWidth = 640;
 const gameHeight = 640;
@@ -22,11 +23,11 @@ window.onload = async (): Promise<void> => {
 
     const playButtonSprite = new Sprite(Loader.shared.resources["play"].texture as Texture);
     playButtonSprite.on("mouseover", () => {
-        playButtonSprite.tint = 0x1bff66;
+        playButtonSprite.tint = Colors.tintHighLight;
     });
 
     playButtonSprite.on("mouseout", () => {
-        playButtonSprite.tint = 0xffffff;
+        playButtonSprite.tint = Colors.defaultTint;
     });
 
     const gameMenuScreen = new GameMenu(playButtonSprite, app, chessBoard);

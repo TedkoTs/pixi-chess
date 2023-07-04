@@ -1,5 +1,5 @@
 import { Piece } from "./piece";
-import { Cell, Pieces, PieceTypeEnum } from "./models";
+import { Cell, Colors, Pieces, PiecesColor, PieceTypeEnum } from "./models";
 import { Application, Container, Graphics, InteractionEvent, Loader, Texture, Ticker } from "pixi.js";
 
 export class ChessBoard extends Container {
@@ -20,7 +20,7 @@ export class ChessBoard extends Container {
             this.squares.push([]);
             for (let col = 0; col < 8; col++) {
                 this.squares[row].push({
-                    color: isDark ? 0x596070 : 0xeaf0d8,
+                    color: isDark ? Colors.darkCell : Colors.lightCell,
                     isSelected: false,
                     piece: null,
                     graphics: new Graphics(),
@@ -72,47 +72,47 @@ export class ChessBoard extends Container {
         const assets = Loader.shared.resources;
         this.pieces = {
             black: {
-                lRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, "black"),
-                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, "black"),
-                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, "black"),
-                queen: new Piece(assets["b_queen"].texture as Texture, PieceTypeEnum.Queen, "black"),
-                king: new Piece(assets["b_king"].texture as Texture, PieceTypeEnum.King, "black"),
-                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, "black"),
-                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, "black"),
-                rRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, "black"),
-                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
-                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, "black"),
+                lRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, PiecesColor.black),
+                lKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, PiecesColor.black),
+                lBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, PiecesColor.black),
+                queen: new Piece(assets["b_queen"].texture as Texture, PieceTypeEnum.Queen, PiecesColor.black),
+                king: new Piece(assets["b_king"].texture as Texture, PieceTypeEnum.King, PiecesColor.black),
+                rBishop: new Piece(assets["b_bishop"].texture as Texture, PieceTypeEnum.Bishop, PiecesColor.black),
+                rKnight: new Piece(assets["b_knight"].texture as Texture, PieceTypeEnum.Knight, PiecesColor.black),
+                rRook: new Piece(assets["b_rook"].texture as Texture, PieceTypeEnum.Rook, PiecesColor.black),
+                pawn1: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn2: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn3: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn4: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn5: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn6: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn7: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
+                pawn8: new Piece(assets["b_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.black),
             },
             white: {
-                lRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, "white"),
-                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, "white"),
-                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, "white"),
-                queen: new Piece(assets["w_queen"].texture as Texture, PieceTypeEnum.Queen, "white"),
-                king: new Piece(assets["w_king"].texture as Texture, PieceTypeEnum.King, "white"),
-                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, "white"),
-                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, "white"),
-                rRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, "white"),
-                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
-                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, "white"),
+                lRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, PiecesColor.white),
+                lKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, PiecesColor.white),
+                lBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, PiecesColor.white),
+                queen: new Piece(assets["w_queen"].texture as Texture, PieceTypeEnum.Queen, PiecesColor.white),
+                king: new Piece(assets["w_king"].texture as Texture, PieceTypeEnum.King, PiecesColor.white),
+                rBishop: new Piece(assets["w_bishop"].texture as Texture, PieceTypeEnum.Bishop, PiecesColor.white),
+                rKnight: new Piece(assets["w_knight"].texture as Texture, PieceTypeEnum.Knight, PiecesColor.white),
+                rRook: new Piece(assets["w_rook"].texture as Texture, PieceTypeEnum.Rook, PiecesColor.white),
+                pawn1: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn2: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn3: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn4: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn5: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn6: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn7: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
+                pawn8: new Piece(assets["w_pawn"].texture as Texture, PieceTypeEnum.Pawn, PiecesColor.white),
             },
         };
 
         for (const color in this.pieces) {
             for (const key in this.pieces[color]) {
                 const piece = this.pieces[color][key];
-                if (color === "black") {
+                if (color === PiecesColor.black) {
                     piece.scale.set(-2);
                 }
                 piece.on("pointerdown", this.onPieceClick, this);
@@ -122,44 +122,44 @@ export class ChessBoard extends Container {
         const whitesRow = 7;
         const blacksRow = 0;
 
-        this.placePiece(whitesRow, 0, this.pieces["white"].lRook);
-        this.placePiece(whitesRow, 1, this.pieces["white"].lKnight);
-        this.placePiece(whitesRow, 2, this.pieces["white"].lBishop);
-        this.placePiece(whitesRow, 5, this.pieces["white"].rBishop);
-        this.placePiece(whitesRow, 6, this.pieces["white"].rKnight);
-        this.placePiece(whitesRow, 7, this.pieces["white"].rRook);
-        this.placePiece(whitesRow, 3, this.pieces["white"].king);
-        this.placePiece(whitesRow, 4, this.pieces["white"].queen);
+        this.placePiece(whitesRow, 0, this.pieces[PiecesColor.white].lRook);
+        this.placePiece(whitesRow, 1, this.pieces[PiecesColor.white].lKnight);
+        this.placePiece(whitesRow, 2, this.pieces[PiecesColor.white].lBishop);
+        this.placePiece(whitesRow, 5, this.pieces[PiecesColor.white].rBishop);
+        this.placePiece(whitesRow, 6, this.pieces[PiecesColor.white].rKnight);
+        this.placePiece(whitesRow, 7, this.pieces[PiecesColor.white].rRook);
+        this.placePiece(whitesRow, 3, this.pieces[PiecesColor.white].king);
+        this.placePiece(whitesRow, 4, this.pieces[PiecesColor.white].queen);
 
         this.addChild(
-            this.pieces["white"].lRook,
-            this.pieces["white"].lKnight,
-            this.pieces["white"].lBishop,
-            this.pieces["white"].queen,
-            this.pieces["white"].king,
-            this.pieces["white"].rBishop,
-            this.pieces["white"].rKnight,
-            this.pieces["white"].rRook,
+            this.pieces[PiecesColor.white].lRook,
+            this.pieces[PiecesColor.white].lKnight,
+            this.pieces[PiecesColor.white].lBishop,
+            this.pieces[PiecesColor.white].queen,
+            this.pieces[PiecesColor.white].king,
+            this.pieces[PiecesColor.white].rBishop,
+            this.pieces[PiecesColor.white].rKnight,
+            this.pieces[PiecesColor.white].rRook,
         );
 
-        this.placePiece(blacksRow, 0, this.pieces["black"].lRook);
-        this.placePiece(blacksRow, 1, this.pieces["black"].lKnight);
-        this.placePiece(blacksRow, 2, this.pieces["black"].lBishop);
-        this.placePiece(blacksRow, 5, this.pieces["black"].rBishop);
-        this.placePiece(blacksRow, 6, this.pieces["black"].rKnight);
-        this.placePiece(blacksRow, 7, this.pieces["black"].rRook);
-        this.placePiece(blacksRow, 3, this.pieces["black"].king);
-        this.placePiece(blacksRow, 4, this.pieces["black"].queen);
+        this.placePiece(blacksRow, 0, this.pieces[PiecesColor.black].lRook);
+        this.placePiece(blacksRow, 1, this.pieces[PiecesColor.black].lKnight);
+        this.placePiece(blacksRow, 2, this.pieces[PiecesColor.black].lBishop);
+        this.placePiece(blacksRow, 5, this.pieces[PiecesColor.black].rBishop);
+        this.placePiece(blacksRow, 6, this.pieces[PiecesColor.black].rKnight);
+        this.placePiece(blacksRow, 7, this.pieces[PiecesColor.black].rRook);
+        this.placePiece(blacksRow, 3, this.pieces[PiecesColor.black].king);
+        this.placePiece(blacksRow, 4, this.pieces[PiecesColor.black].queen);
 
         this.addChild(
-            this.pieces["black"].lRook,
-            this.pieces["black"].lKnight,
-            this.pieces["black"].lBishop,
-            this.pieces["black"].queen,
-            this.pieces["black"].king,
-            this.pieces["black"].rBishop,
-            this.pieces["black"].rKnight,
-            this.pieces["black"].rRook,
+            this.pieces[PiecesColor.black].lRook,
+            this.pieces[PiecesColor.black].lKnight,
+            this.pieces[PiecesColor.black].lBishop,
+            this.pieces[PiecesColor.black].queen,
+            this.pieces[PiecesColor.black].king,
+            this.pieces[PiecesColor.black].rBishop,
+            this.pieces[PiecesColor.black].rKnight,
+            this.pieces[PiecesColor.black].rRook,
         );
 
         for (let i = 1; i <= 8; i++) {
@@ -205,7 +205,7 @@ export class ChessBoard extends Container {
         const cell = this.getCellOnClick(event);
 
         if (!this.selectedCell) {
-            if (cell.piece && cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+            if (cell.piece && cell.piece.color === (this.isWhiteTurn ? PiecesColor.white : PiecesColor.black)) {
                 this.selectedCell = cell;
                 this.selectedCell.isSelected = true;
                 this.addHighlight(this.selectedCell);
@@ -215,7 +215,10 @@ export class ChessBoard extends Container {
             this.selectedCell.isSelected = false;
             this.selectedCell = undefined;
         } else if (!cell.piece) {
-            if (this.selectedCell.piece && this.selectedCell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+            if (
+                this.selectedCell.piece &&
+                this.selectedCell.piece.color === (this.isWhiteTurn ? PiecesColor.white : PiecesColor.black)
+            ) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
                 if (this.isValidMove(this.selectedCell.piece, this.targetCell)) {
@@ -226,7 +229,7 @@ export class ChessBoard extends Container {
                 }
             }
         } else if (this.selectedCell.piece !== cell.piece) {
-            if (cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
+            if (cell.piece.color === (this.isWhiteTurn ? PiecesColor.white : PiecesColor.black)) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
                 this.addHighlight(this.targetCell);
@@ -234,7 +237,7 @@ export class ChessBoard extends Container {
                 this.selectedCell.isSelected = true;
                 this.targetCell = undefined;
             }
-            if (cell.piece.color !== (this.isWhiteTurn ? "white" : "black")) {
+            if (cell.piece.color !== (this.isWhiteTurn ? PiecesColor.white : PiecesColor.black)) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
                 if (this.isValidMove(this.selectedCell.piece, this.targetCell)) {
@@ -256,29 +259,29 @@ export class ChessBoard extends Container {
 
     addHighlight(cell: Cell) {
         const piece = cell.piece;
-        if (piece && piece.color === "white") {
+        if (piece && piece.color === PiecesColor.white) {
             piece.anchor.set(0.5, 0.7);
             piece.scale.set(2.5);
-            piece.tint = 0x1bff66;
+            piece.tint = Colors.tintHighLight;
         }
-        if (piece && piece.color === "black") {
+        if (piece && piece.color === PiecesColor.black) {
             piece.anchor.set(0.5, 0.7);
             piece.scale.set(-2.5);
-            piece.tint = 0x1bff66;
+            piece.tint = Colors.tintHighLight;
         }
     }
 
     removeHighlight(cell: Cell) {
         const piece = cell.piece;
-        if (piece && piece.color === "white") {
+        if (piece && piece.color === PiecesColor.white) {
             piece.anchor.set(0.5, 0.5);
             piece.scale.set(2);
-            piece.tint = 0xffffff;
+            piece.tint = Colors.defaultTint;
         }
-        if (piece && piece.color === "black") {
+        if (piece && piece.color === PiecesColor.black) {
             piece.anchor.set(0.5, 0.5);
             piece.scale.set(-2);
-            piece.tint = 0xffffff;
+            piece.tint = Colors.defaultTint;
         }
     }
 
@@ -339,7 +342,7 @@ export class ChessBoard extends Container {
             return false;
         }
 
-        const forwardDirection = piece.color === "white" ? -1 : 1;
+        const forwardDirection = piece.color === PiecesColor.white ? -1 : 1;
         const rowDistance = targetRow - startRow;
         const colDistance = Math.abs(targetCol - startCol);
 

@@ -44,3 +44,15 @@ export enum PieceTypeEnum {
     Queen = "Q",
     King = "K",
 }
+
+export enum Colors {
+    tintHighLight = 0x1bff66,
+    defaultTint = 0xffffff,
+    darkCell = 0x596070,
+    lightCell = 0xeaf0d8,
+}
+
+export enum PiecesColor {
+    black = "black",
+    white = "white",
+}

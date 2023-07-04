@@ -350,6 +350,11 @@ export class ChessBoard extends Container {
             return false;
         }
 
+        const targetCellPiece = targetCell.piece;
+        if (colDistance === 0 && targetCellPiece) {
+            return false;
+        }
+
         if (rowDistance === forwardDirection && colDistance === 0) {
             return true;
         }

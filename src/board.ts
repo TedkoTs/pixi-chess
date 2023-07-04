@@ -170,7 +170,7 @@ export class ChessBoard extends PIXI.Container {
         }
 
         if (this.isWhiteTurn) {
-            this.disableBlackPieces();
+            // this.disableBlackPieces();
         }
     }
 
@@ -206,10 +206,10 @@ export class ChessBoard extends PIXI.Container {
 
     switchTurn() {
         if (this.isWhiteTurn) {
-            this.enableBlackPieces();
+            // this.enableBlackPieces();
             this.isWhiteTurn = false;
         } else {
-            this.disableBlackPieces();
+            // this.disableBlackPieces();
             this.isWhiteTurn = true;
         }
         setTimeout(() => {
@@ -238,6 +238,8 @@ export class ChessBoard extends PIXI.Container {
         PIXI.Ticker.shared.add(updateRotation);
     }
 
+    // todo possibly takes the color of the cells not the pieces -> white pieces go on white cells but remove on black cells
+
     onPieceClick(event: InteractionEvent) {
         const cell = this.getCellOnClick(event);
 
@@ -245,7 +247,7 @@ export class ChessBoard extends PIXI.Container {
             if (cell.piece && cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
                 this.selectedCell = cell;
                 this.selectedCell.isSelected = true;
-                this.highlight(this.selectedCell);
+                this.addHighlight(this.selectedCell);
             }
         } else if (this.selectedCell === cell) {
             this.removeHighlight(this.selectedCell);
@@ -261,9 +263,17 @@ export class ChessBoard extends PIXI.Container {
             if (cell.piece.color === (this.isWhiteTurn ? "white" : "black")) {
                 this.targetCell = cell;
                 this.removeHighlight(this.selectedCell);
-                this.selectedCell.isSelected = false;
-                this.selectedCell = undefined;
-                this.highlight(this.targetCell);
+                this.addHighlight(this.targetCell);
+                this.selectedCell = cell;
+                this.selectedCell.isSelected = true;
+                this.targetCell = undefined;
+            }
+            if (cell.piece.color !== (this.isWhiteTurn ? "white" : "black")) {
+                this.targetCell = cell;
+                this.removeHighlight(this.selectedCell);
+                this.removePieceFromBoard(this.targetCell);
+
+                this.moveSelectedToTarget();
             }
         }
     }
@@ -275,7 +285,7 @@ export class ChessBoard extends PIXI.Container {
         return this.squares[row][col];
     }
 
-    highlight(cell: Cell) {
+    addHighlight(cell: Cell) {
         const piece = cell.piece;
         if (piece && piece.color === "white") {
             piece.anchor.set(0.5, 0.7);
@@ -302,8 +312,9 @@ export class ChessBoard extends PIXI.Container {
     moveSelectedToTarget() {
         if (this.selectedCell && this.targetCell) {
             const pieceToMove = this.selectedCell.piece;
-            if (pieceToMove) {
+            if (pieceToMove && this.isValidMove(pieceToMove, this.targetCell)) {
                 const { row: targetRow, col: targetCol } = this.targetCell;
+
                 this.placePiece(targetRow, targetCol, pieceToMove);
                 this.selectedCell.piece = null;
             }
@@ -312,6 +323,191 @@ export class ChessBoard extends PIXI.Container {
             this.selectedCell = undefined;
             this.targetCell = undefined;
         }
+
         this.switchTurn();
+    }
+
+    isValidMove(piece: Piece, targetCell: Cell): boolean {
+        if (targetCell.piece && targetCell.piece.color === piece.color) {
+            return false;
+        }
+        switch (piece.pieceType) {
+            case PieceType.Pawn:
+                return this.isValidPawnMove(piece, targetCell);
+            case PieceType.Rook:
+                return this.isValidRookMove(piece, targetCell);
+            case PieceType.Knight:
+                return this.isValidKnightMove(piece, targetCell);
+            case PieceType.Bishop:
+                return this.isValidBishopMove(piece, targetCell);
+            case PieceType.Queen:
+                return this.isValidRookMove(piece, targetCell) || this.isValidBishopMove(piece, targetCell);
+            case PieceType.King:
+                return this.isValidKingMove(piece, targetCell);
+            default:
+                return false;
+        }
+    }
+
+    //todo don't change player on illegal move
+    checkFirstPawnMove(row: number | undefined) {
+        return row === 1 || row === 6;
+    }
+
+    isValidPawnMove(piece: Piece, targetCell: Cell): boolean {
+        const startRow = this.selectedCell?.row;
+        const startCol = this.selectedCell?.col;
+        const { row: targetRow, col: targetCol } = targetCell;
+
+        if (startRow === undefined || startCol === undefined) {
+            return false;
+        }
+
+        if (startRow === targetRow && startCol === targetCol) {
+            return false;
+        }
+
+        const forwardDirection = piece.color === "white" ? -1 : 1;
+        const rowDistance = targetRow - startRow;
+        const colDistance = Math.abs(targetCol - startCol);
+
+        if (rowDistance * forwardDirection <= 0) {
+            return false;
+        }
+
+        if (rowDistance === forwardDirection && colDistance === 0) {
+            return true;
+        }
+
+        if (rowDistance === 2 * forwardDirection && colDistance === 0 && this.checkFirstPawnMove(startRow)) {
+            const intermediateRow = startRow + forwardDirection;
+            return this.squares[intermediateRow][startCol].piece === null;
+        }
+
+        if (rowDistance === forwardDirection && colDistance === 1) {
+            const targetCellPiece = targetCell.piece;
+            if (targetCellPiece && targetCellPiece.color !== piece.color) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    isValidKnightMove(piece: Piece, targetCell: Cell): boolean {
+        const startRow = this.selectedCell?.row;
+        const startCol = this.selectedCell?.col;
+        const { row: targetRow, col: targetCol } = targetCell;
+        let rowDiff, colDiff;
+
+        if (startRow === undefined || startCol === undefined) {
+            return false;
+        }
+
+        if ((startRow || startRow === 0) && (startCol || startCol === 0)) {
+            rowDiff = Math.abs(startRow - targetRow);
+            colDiff = Math.abs(startCol - targetCol);
+        }
+        return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+    }
+
+    isValidRookMove(piece: Piece, targetCell: Cell): boolean {
+        const startRow = this.selectedCell?.row;
+        const startCol = this.selectedCell?.col;
+        const { row: targetRow, col: targetCol } = targetCell;
+
+        if (startRow === undefined || startCol === undefined) {
+            return false;
+        }
+
+        if (startRow === targetRow && startCol === targetCol) {
+            return false;
+        }
+
+        if (startRow === targetRow || startCol === targetCol) {
+            const rowStep = startRow === targetRow ? 0 : startRow < targetRow ? 1 : -1;
+            const colStep = startCol === targetCol ? 0 : startCol < targetCol ? 1 : -1;
+
+            let currentRow = startRow + rowStep;
+            let currentCol = startCol + colStep;
+
+            while (currentRow !== targetRow || currentCol !== targetCol) {
+                const currentCell = this.squares[currentRow][currentCol];
+                if (currentCell.piece) {
+                    return false;
+                }
+                currentRow += rowStep;
+                currentCol += colStep;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    isValidBishopMove(piece: Piece, targetCell: Cell): boolean {
+        const startRow = this.selectedCell?.row;
+        const startCol = this.selectedCell?.col;
+        const { row: targetRow, col: targetCol } = targetCell;
+
+        if (startRow === undefined || startCol === undefined) {
+            return false;
+        }
+
+        if (startRow === targetRow && startCol === targetCol) {
+            return false;
+        }
+
+        const rowDistance = Math.abs(targetRow - startRow);
+        const colDistance = Math.abs(targetCol - startCol);
+
+        if (rowDistance !== colDistance) {
+            return false;
+        }
+
+        const rowStep = targetRow > startRow ? 1 : -1;
+        const colStep = targetCol > startCol ? 1 : -1;
+
+        let currentRow = startRow + rowStep;
+        let currentCol = startCol + colStep;
+
+        while (currentRow !== targetRow && currentCol !== targetCol) {
+            const currentCell = this.squares[currentRow][currentCol];
+            if (currentCell.piece) {
+                return false;
+            }
+            currentRow += rowStep;
+            currentCol += colStep;
+        }
+
+        return true;
+    }
+
+    isValidKingMove(piece: Piece, targetCell: Cell): boolean {
+        const startRow = this.selectedCell?.row;
+        const startCol = this.selectedCell?.col;
+        const { row: targetRow, col: targetCol } = targetCell;
+
+        if (startRow === undefined || startCol === undefined) {
+            return false;
+        }
+
+        if (startRow === targetRow && startCol === targetCol) {
+            return false;
+        }
+
+        const rowDistance = Math.abs(targetRow - startRow);
+        const colDistance = Math.abs(targetCol - startCol);
+
+        if (rowDistance > 1 || colDistance > 1) {
+            return false;
+        }
+
+        return true;
+    }
+
+    removePieceFromBoard(cell: Cell): void {
+        this.removeChild(cell.piece);
     }
 }
